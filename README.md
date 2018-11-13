@@ -14,3 +14,5 @@ Amadeus works bi-directionally; a user can use the web app to create text messag
 
 ## Screenshots
 
+Application Home Screen
+![Application Home Screen](http://i68.tinypic.com/5lp6aq.jpg)
