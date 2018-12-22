@@ -3,6 +3,7 @@ package com.example.archer.amadeus;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -33,7 +34,6 @@ public class SMSReceiver extends BroadcastReceiver {
     private SmsSingleton smsSingleton = SmsSingleton.getInstance();
     private String AMADEUS_API_URL;
 
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onReceive(Context c, Intent intent) {
@@ -42,20 +42,28 @@ public class SMSReceiver extends BroadcastReceiver {
         String actionName = intent.getAction();
         Bundle bundle = intent.getExtras();
 
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        boolean hasHadFirstLogin = sharedPref.getBoolean(context.getString(R.string.pref_has_had_first_login), false);
+        int userId = sharedPref.getInt(context.getString(R.string.pref_user_id), -1);
 
-        if (actionName.equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
-            handleTextMessageReceived(intent);
-        } else if (actionName.equals(SMS_SENT_ACTION)) {
-            String msgUri = bundle.getString("uri");
-            String amadeusId = bundle.getString("amadeusId");
-            String msgid_phone_db = msgUri.substring(msgUri.lastIndexOf("/") + 1, msgUri.length());
+        if (hasHadFirstLogin && userId > -1) {
 
-            updateServerWithWebappMessageId(amadeusId, msgid_phone_db);
+            if (actionName.equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
+
+                handleTextMessageReceived(intent, userId);
+
+            } else if (actionName.equals(SMS_SENT_ACTION)) {
+                String msgUri = bundle.getString("uri");
+                String amadeusId = bundle.getString("amadeusId");
+                String msgid_phone_db = msgUri.substring(msgUri.lastIndexOf("/") + 1, msgUri.length());
+
+                updateServerWithWebappMessageId(amadeusId, msgid_phone_db);
+            }
         }
 
     }
 
-    private void handleTextMessageReceived(Intent intent) {
+    private void handleTextMessageReceived(Intent intent, int userId) {
         Bundle bundle = intent.getExtras();
 
         try {
@@ -67,7 +75,7 @@ public class SMSReceiver extends BroadcastReceiver {
                     String phoneNumber = message.getDisplayOriginatingAddress();
                     String messageBody = message.getMessageBody();
                     Long timestamp = message.getTimestampMillis();
-                    postTextToServer(phoneNumber, messageBody, timestamp);
+                    postTextToServer(phoneNumber, messageBody, timestamp, userId);
                 }
 
             }
@@ -76,7 +84,8 @@ public class SMSReceiver extends BroadcastReceiver {
         }
     }
 
-    public void postTextToServer(final String phoneNumber, final String messageBody, final Long timestamp) {
+    public void postTextToServer(final String phoneNumber, final String messageBody, final Long timestamp, final int userId) {
+
         final Context selfContext = this.context;
         RequestQueue queue = Volley.newRequestQueue(this.context);
         String url = AMADEUS_API_URL + "/texts";
@@ -100,6 +109,7 @@ public class SMSReceiver extends BroadcastReceiver {
                 params.put("toPhoneNumber", "6313360360");
                 params.put("textMessageBody", messageBody);
                 params.put("timestamp", timestamp.toString());
+                params.put("userId", Integer.toString(userId));
                 return params;
             }
         };
@@ -107,9 +117,10 @@ public class SMSReceiver extends BroadcastReceiver {
     }
 
     public void updateServerWithWebappMessageId(final String amadeusId, final String msgid_phone_db) {
-        final Context selfContext = this.context;
+
+        final Context selfContext = context;
         String url = AMADEUS_API_URL + "/texts/update-outgoing-text-message-id";
-        RequestQueue queue = Volley.newRequestQueue(this.context);
+        RequestQueue queue = Volley.newRequestQueue(context);
 
         StringRequest strRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {

@@ -1,13 +1,29 @@
 <resources>
-    <string name="AMADEUS_BASE_API_URL">https://whispering-woodland-59077.herokuapp.com/api</string>
-    <string name="AMADEUS_LOCALHOST_API_URL">http://192.168.1.110:8999/api</string>
+    <string name="AMADEUS_BASE_API_URL">https://amadeusapp.herokuapp.com/api</string>
+    <!--<string name="AMADEUS_BASE_API_URL">http://192.168.1.50:8999/api</string>-->
 
 
     <string name="app_name">Amadeus</string>
-    <string name="preference_file_key">com.example.archer.amadeus.PREFERENCE_FILE_KEY</string>
+
     <string name="firebase_token_key">firebase_token</string>
     <string name="last_sent_text_id_key">last_sent_text</string>
     <string name="title_activity_error_log">Error Log Activity</string>
     <string name="button_view_errors">View Error Log</string>
     <string name="button_delete_all_errors">Delete All Errors</string>
+    <string name="title_activity_login">Sign in</string>
+
+    <string name="preference_file_key">com.example.archer.amadeus.PREFERENCE_FILE_KEY</string>
+    <string name="pref_email">email_address</string>
+    <string name="pref_user_id">user_id</string>
+    <string name="pref_has_had_first_login">has_had_first_login</string>
+
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="error_invalid_email">This email address is invalid</string>
+    <string name="error_invalid_password">This password is too short</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
 </resources>

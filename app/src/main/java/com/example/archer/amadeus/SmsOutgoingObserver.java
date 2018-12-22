@@ -42,7 +42,8 @@ public class SmsOutgoingObserver extends ContentObserver {
     private String lastSmsId = "";
     private SmsSingleton smsSingleton;
     private String AMADEUS_API_URL;
-
+    private int userId;
+    private boolean hasHadFirstLogin;
 
 
     public SmsOutgoingObserver(Handler handler, Context c) {
@@ -50,6 +51,10 @@ public class SmsOutgoingObserver extends ContentObserver {
         context = c;
         smsSingleton = SmsSingleton.getInstance();
         AMADEUS_API_URL = context.getString(R.string.AMADEUS_BASE_API_URL);
+
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        hasHadFirstLogin = sharedPref.getBoolean(context.getString(R.string.pref_has_had_first_login), false);
+        userId = sharedPref.getInt(context.getString(R.string.pref_user_id), -1);
     }
 
     @Override
@@ -77,12 +82,12 @@ public class SmsOutgoingObserver extends ContentObserver {
         } else {
 
 
-            if (checkForSmsDuplicate(_id)) {
+            if (checkForSmsDuplicate(_id) && hasHadFirstLogin && userId > -1) {
                 String thread_id = cur.getString(cur.getColumnIndex("thread_id"));
                 String address = cur.getString(cur.getColumnIndex("address"));
                 address = address.indexOf("+") > -1 ? address.substring(2, 12) : address;
                 String body = cur.getString(cur.getColumnIndex("body"));
-                relayOwnMessageUpstream(_id, thread_id, "6313360360", address, body, new Date().getTime());
+                relayOwnMessageUpstream(_id, thread_id, "6313360360", address, body, new Date().getTime(), userId);
             }
             cur.close();
         }
@@ -101,7 +106,7 @@ public class SmsOutgoingObserver extends ContentObserver {
         return flagSms;
     }
 
-    public void relayOwnMessageUpstream(final String _id, final String thread_id, final String fromPhoneNumber, final String toPhoneNumber, final String messageBody, final Long timestamp) {
+    public void relayOwnMessageUpstream(final String _id, final String thread_id, final String fromPhoneNumber, final String toPhoneNumber, final String messageBody, final Long timestamp, final int userId) {
         if (_id.equals(getLastSentTextId())) {
             return;
         }
@@ -133,6 +138,7 @@ public class SmsOutgoingObserver extends ContentObserver {
                 params.put("fromPhoneNumber", fromPhoneNumber);
                 params.put("toPhoneNumber", toPhoneNumber);
                 params.put("textMessageBody", messageBody);
+                params.put("userId", Integer.toString(userId));
                 return params;
             }
         };
