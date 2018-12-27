@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Parcelable;
 import android.provider.Telephony;
 import android.support.annotation.RequiresApi;
@@ -16,14 +15,11 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -38,7 +34,7 @@ public class SMSReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context c, Intent intent) {
         context = c;
-        AMADEUS_API_URL = context.getString(R.string.AMADEUS_BASE_API_URL);
+        AMADEUS_API_URL = AmadeusApplication.AMADEUS_API_URL;
         String actionName = intent.getAction();
         Bundle bundle = intent.getExtras();
 
@@ -88,7 +84,6 @@ public class SMSReceiver extends BroadcastReceiver {
     public void postTextToServer(final String phoneNumber, final String messageBody, final Long timestamp, final int userId, final String userPhoneNumber) {
 
         final Context selfContext = context;
-        RequestQueue queue = Volley.newRequestQueue(context);
         String url = AMADEUS_API_URL + "/texts/send-sms-to-server";
         
         StringRequest strRequest = new StringRequest(Request.Method.POST, url,
@@ -115,14 +110,13 @@ public class SMSReceiver extends BroadcastReceiver {
                 return params;
             }
         };
-        queue.add(strRequest);
+        AmadeusApplication.getInstance().getRequestQueue().add(strRequest);
     }
 
     public void updateServerWithWebappMessageId(final String amadeusId, final String msgid_phone_db) {
 
         final Context selfContext = context;
         String url = AMADEUS_API_URL + "/texts/update-outgoing-text-message-id";
-        RequestQueue queue = Volley.newRequestQueue(context);
 
         StringRequest strRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
@@ -145,7 +139,7 @@ public class SMSReceiver extends BroadcastReceiver {
                 return params;
             }
         };
-        queue.add(strRequest);
+        AmadeusApplication.getInstance().getRequestQueue().add(strRequest);
     }
 
 

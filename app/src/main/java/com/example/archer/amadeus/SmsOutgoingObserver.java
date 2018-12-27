@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Handler;
-import android.util.Log;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -41,7 +40,6 @@ public class SmsOutgoingObserver extends ContentObserver {
     private Context context;
     private String lastSmsId = "";
     private SmsSingleton smsSingleton;
-    private String AMADEUS_API_URL;
     private int userId;
     private boolean hasHadFirstLogin;
     private String userPhoneNumber;
@@ -51,7 +49,6 @@ public class SmsOutgoingObserver extends ContentObserver {
 
         context = c;
         smsSingleton = SmsSingleton.getInstance();
-        AMADEUS_API_URL = context.getString(R.string.AMADEUS_BASE_API_URL);
 
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         hasHadFirstLogin = sharedPref.getBoolean(context.getString(R.string.pref_has_had_first_login), false);
@@ -115,7 +112,7 @@ public class SmsOutgoingObserver extends ContentObserver {
         }
         final Context selfContext = context;
         RequestQueue queue = Volley.newRequestQueue(context);
-        String url = AMADEUS_API_URL + "/texts/own";
+        String url = AmadeusApplication.AMADEUS_API_URL + "/texts/own";
 
         StringRequest strRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {

@@ -7,7 +7,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
 public class AmadeusApplication extends Application {
-    public final String AMADEUS_API_URL = getString(R.string.AMADEUS_BASE_API_URL);
+    public static String AMADEUS_API_URL;
     private static AmadeusApplication instance;
     private RequestQueue queue;
 
@@ -17,6 +17,7 @@ public class AmadeusApplication extends Application {
         super.onCreate();
 
         instance = this;
+        AMADEUS_API_URL = getString(R.string.AMADEUS_BASE_API_URL);
     }
 
     public static synchronized AmadeusApplication getInstance() {

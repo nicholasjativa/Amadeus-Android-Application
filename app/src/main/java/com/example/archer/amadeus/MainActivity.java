@@ -20,11 +20,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,7 +33,6 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private static final int PERMISSIONS_ASKED_FOR = 2;
-    private String AMADEUS_API_URL;
     private int userId;
 
     @Override
@@ -43,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        AMADEUS_API_URL = String.format("%s", getString(R.string.AMADEUS_BASE_API_URL));
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         boolean hasHadFirstLogin = sharedPref.getBoolean(getString(R.string.pref_has_had_first_login), false);
         String firebaseToken = sharedPref.getString(getString(R.string.firebase_token_key), "No Firebase Token currently exists.");
@@ -133,9 +129,8 @@ public class MainActivity extends AppCompatActivity {
     private void transmitContacts(final JSONArray contacts) {
 
         final Context context = this;
-        RequestQueue queue = Volley.newRequestQueue(this);
 
-        String url = AMADEUS_API_URL + "/contacts";
+        String url = AmadeusApplication.AMADEUS_API_URL + "/contacts";
         Map<String, String> params = new HashMap();
         params.put("contacts", contacts.toString());
         params.put("userId", Integer.toString(userId));
@@ -160,15 +155,14 @@ public class MainActivity extends AppCompatActivity {
 
         };
 
-        queue.add(req);
+        AmadeusApplication.getInstance().getRequestQueue().add(req);
     }
 
     private void sendRegistrationTokenToServer(String firebaseToken) {
 
         final Context self = this;
-        RequestQueue queue = Volley.newRequestQueue(this);
 
-        String url = AMADEUS_API_URL + "/users/update-registration-token";
+        String url = AmadeusApplication.AMADEUS_API_URL + "/users/update-registration-token";
         Map<String, String> params = new HashMap();
         params.put("registrationToken", firebaseToken);
         params.put("userId", Integer.toString(userId));
@@ -191,7 +185,7 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        queue.add(req);
+        AmadeusApplication.getInstance().getRequestQueue().add(req);
     }
 
 }

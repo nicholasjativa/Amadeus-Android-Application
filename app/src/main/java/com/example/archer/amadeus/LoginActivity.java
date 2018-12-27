@@ -18,11 +18,9 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.android.volley.Request;
-import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.Volley;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,7 +38,6 @@ public class LoginActivity extends AppCompatActivity {
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
-    private String AMADEUS_API_URL;
     private SharedPreferences sharedPref;
     private SharedPreferences.Editor editor;
 
@@ -49,7 +46,6 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        AMADEUS_API_URL = getString(R.string.AMADEUS_BASE_API_URL);
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         mPasswordView = (EditText) findViewById(R.id.password);
 
@@ -115,14 +111,13 @@ public class LoginActivity extends AppCompatActivity {
     private void executeLoginRequest(final String email, final String password) {
 
         final Context self = this;
-        String url = AMADEUS_API_URL + "/users/login";
+        String url = AmadeusApplication.AMADEUS_API_URL + "/users/login";
 
         Map<String, String> params = new HashMap();
         params.put("emailAddress", email);
         params.put("password", password);
         JSONObject jsonRequest = new JSONObject(params);
 
-        RequestQueue queue = Volley.newRequestQueue(this);
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, url, jsonRequest,
 
                 new Response.Listener<JSONObject>() {
@@ -161,7 +156,7 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 });
 
-        queue.add(req);
+        AmadeusApplication.getInstance().getRequestQueue().add(req);
     }
 
     private boolean isEmailValid(String email) {
