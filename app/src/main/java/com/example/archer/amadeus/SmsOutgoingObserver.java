@@ -44,7 +44,7 @@ public class SmsOutgoingObserver extends ContentObserver {
     private String AMADEUS_API_URL;
     private int userId;
     private boolean hasHadFirstLogin;
-
+    private String userPhoneNumber;
 
     public SmsOutgoingObserver(Handler handler, Context c) {
         super(handler);
@@ -55,6 +55,8 @@ public class SmsOutgoingObserver extends ContentObserver {
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         hasHadFirstLogin = sharedPref.getBoolean(context.getString(R.string.pref_has_had_first_login), false);
         userId = sharedPref.getInt(context.getString(R.string.pref_user_id), -1);
+        userPhoneNumber = sharedPref.getString(context.getString(R.string.pref_user_phone_number), ""); // TODO this may have to eventually come from phone OS?
+
     }
 
     @Override
@@ -87,7 +89,7 @@ public class SmsOutgoingObserver extends ContentObserver {
                 String address = cur.getString(cur.getColumnIndex("address"));
                 address = address.indexOf("+") > -1 ? address.substring(2, 12) : address;
                 String body = cur.getString(cur.getColumnIndex("body"));
-                relayOwnMessageUpstream(_id, thread_id, "6313360360", address, body, new Date().getTime(), userId);
+                relayOwnMessageUpstream(_id, thread_id, userPhoneNumber, address, body, new Date().getTime(), userId);
             }
             cur.close();
         }

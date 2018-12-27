@@ -153,10 +153,12 @@ public class LoginActivity extends AppCompatActivity {
                             JSONObject user = response.getJSONObject("user");
                             String email = user.getString("emailAddress");
                             int userId = user.getInt("id");
+                            String userPhoneNumber = user.getString("phoneNumber");
 
                             editor = sharedPref.edit();
                             editor.putString(getString(R.string.pref_email), email);
                             editor.putInt(getString(R.string.pref_user_id), userId);
+                            editor.putString(getString(R.string.pref_user_phone_number), userPhoneNumber);
                             editor.commit();
 
                             startActivity(homeIntent);

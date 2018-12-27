@@ -45,12 +45,13 @@ public class SMSReceiver extends BroadcastReceiver {
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         boolean hasHadFirstLogin = sharedPref.getBoolean(context.getString(R.string.pref_has_had_first_login), false);
         int userId = sharedPref.getInt(context.getString(R.string.pref_user_id), -1);
+        String userPhoneNumber = sharedPref.getString(context.getString(R.string.pref_user_phone_number), ""); // TODO these may have to become instance variables
 
         if (hasHadFirstLogin && userId > -1) {
 
             if (actionName.equals(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)) {
 
-                handleTextMessageReceived(intent, userId);
+                handleTextMessageReceived(intent, userId, userPhoneNumber);
 
             } else if (actionName.equals(SMS_SENT_ACTION)) {
                 String msgUri = bundle.getString("uri");
@@ -63,7 +64,7 @@ public class SMSReceiver extends BroadcastReceiver {
 
     }
 
-    private void handleTextMessageReceived(Intent intent, int userId) {
+    private void handleTextMessageReceived(Intent intent, int userId, String userPhoneNumber) {
         Bundle bundle = intent.getExtras();
 
         try {
@@ -75,7 +76,7 @@ public class SMSReceiver extends BroadcastReceiver {
                     String phoneNumber = message.getDisplayOriginatingAddress();
                     String messageBody = message.getMessageBody();
                     Long timestamp = message.getTimestampMillis();
-                    postTextToServer(phoneNumber, messageBody, timestamp, userId);
+                    postTextToServer(phoneNumber, messageBody, timestamp, userId, userPhoneNumber);
                 }
 
             }
@@ -84,11 +85,12 @@ public class SMSReceiver extends BroadcastReceiver {
         }
     }
 
-    public void postTextToServer(final String phoneNumber, final String messageBody, final Long timestamp, final int userId) {
+    public void postTextToServer(final String phoneNumber, final String messageBody, final Long timestamp, final int userId, final String userPhoneNumber) {
 
-        final Context selfContext = this.context;
-        RequestQueue queue = Volley.newRequestQueue(this.context);
-        String url = AMADEUS_API_URL + "/texts";
+        final Context selfContext = context;
+        RequestQueue queue = Volley.newRequestQueue(context);
+        String url = AMADEUS_API_URL + "/texts/send-sms-to-server";
+        
         StringRequest strRequest = new StringRequest(Request.Method.POST, url,
                 new Response.Listener<String>() {
                     @Override
@@ -106,7 +108,7 @@ public class SMSReceiver extends BroadcastReceiver {
             protected Map<String, String> getParams() {
                 Map<String, String> params = new HashMap<String, String>();
                 params.put("fromPhoneNumber", phoneNumber);
-                params.put("toPhoneNumber", "6313360360");
+                params.put("toPhoneNumber", userPhoneNumber);
                 params.put("textMessageBody", messageBody);
                 params.put("timestamp", timestamp.toString());
                 params.put("userId", Integer.toString(userId));
