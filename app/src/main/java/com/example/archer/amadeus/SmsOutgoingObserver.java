@@ -48,6 +48,7 @@ public class SmsOutgoingObserver extends ContentObserver {
 
     public SmsOutgoingObserver(Handler handler, Context c) {
         super(handler);
+
         context = c;
         smsSingleton = SmsSingleton.getInstance();
         AMADEUS_API_URL = context.getString(R.string.AMADEUS_BASE_API_URL);
@@ -74,7 +75,7 @@ public class SmsOutgoingObserver extends ContentObserver {
 
         String _id = cur.getString(cur.getColumnIndex("_id"));
 
-        if (smsSingleton.getOutgoingSkipCount() > 0) {
+        if (smsSingleton.getOutgoingSkipCount() > 0 && hasHadFirstLogin && userId > -1) {
 
             // don't send the message up to the server (since it came from the webapp)
             // and decrement the count

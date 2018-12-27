@@ -5,20 +5,16 @@ import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Handler;
-import android.provider.ContactsContract;
-import android.provider.Telephony;
-import android.support.annotation.NonNull;
+import android.provider.ContactsContract;;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,16 +24,12 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -48,19 +40,18 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        AMADEUS_API_URL = String.format("%s", getString(R.string.AMADEUS_BASE_API_URL));
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        AMADEUS_API_URL = String.format("%s", getString(R.string.AMADEUS_BASE_API_URL));
         SharedPreferences sharedPref = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-
         boolean hasHadFirstLogin = sharedPref.getBoolean(getString(R.string.pref_has_had_first_login), false);
         String firebaseToken = sharedPref.getString(getString(R.string.firebase_token_key), "No Firebase Token currently exists.");
         userId = sharedPref.getInt(getString(R.string.pref_user_id), -1);
 
         if (!hasHadFirstLogin) {
             sendRegistrationTokenToServer(firebaseToken);
-            SharedPreferences.Editor editor=  sharedPref.edit();
+            SharedPreferences.Editor editor =  sharedPref.edit();
             editor.putBoolean(getString(R.string.pref_has_had_first_login), true);
             editor.commit();
         }
@@ -68,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
             startRequestPermissions();
         } else {
+
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -78,10 +70,8 @@ public class MainActivity extends AppCompatActivity {
 
             TextView textView = (TextView) findViewById(R.id.firebaseToken);
             textView.setText(firebaseToken);
-
-
-
-            setupOutgoingSmsObserver();
+            SmsOutgoingObserver observer = new SmsOutgoingObserver(new Handler(), this);
+            getContentResolver().registerContentObserver(Uri.parse("content://sms"), true, observer); // TODO this should be a long running service
         }
     }
 
@@ -140,24 +130,23 @@ public class MainActivity extends AppCompatActivity {
         return contactsArr;
     }
 
-
-
-    public void setupOutgoingSmsObserver() {
-        SmsOutgoingObserver observer = new SmsOutgoingObserver(new Handler(), this);
-        getContentResolver().registerContentObserver(Uri.parse("content://sms"), true, observer);
-    }
-
     private void transmitContacts(final JSONArray contacts) {
+
         final Context context = this;
         RequestQueue queue = Volley.newRequestQueue(this);
 
         String url = AMADEUS_API_URL + "/contacts";
+        Map<String, String> params = new HashMap();
+        params.put("contacts", contacts.toString());
+        params.put("userId", Integer.toString(userId));
+        JSONObject jsonRequest = new JSONObject(params);
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, url, jsonRequest,
+
+                new Response.Listener<JSONObject>() {
 
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONObject response) {
                         Toast.makeText(context, "Successfully uploaded contacts", Toast.LENGTH_SHORT).show();
                     }
                 },
@@ -168,16 +157,10 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show();
                     }
                 }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("contacts", contacts.toString());
-                params.put("userId", Integer.toString(userId));
-                return params;
-            }
+
         };
 
-        queue.add(stringRequest);
+        queue.add(req);
     }
 
     private void sendRegistrationTokenToServer(String firebaseToken) {
