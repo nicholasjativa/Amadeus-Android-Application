@@ -17,7 +17,10 @@ import android.widget.Toast;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.JsonRequest;
+
+import org.json.JSONObject;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -85,11 +88,21 @@ public class SMSReceiver extends BroadcastReceiver {
 
         final Context selfContext = context;
         String url = AMADEUS_API_URL + "/texts/send-sms-to-server";
-        
-        StringRequest strRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("fromPhoneNumber", phoneNumber);
+        params.put("toPhoneNumber", userPhoneNumber);
+        params.put("textMessageBody", messageBody);
+        params.put("timestamp", timestamp.toString());
+        params.put("userId", userId);
+
+        JSONObject jsonRequest = new JSONObject(params);
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, url, jsonRequest,
+
+                new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONObject response) {
                         Toast.makeText(selfContext, "Response from Server after relaying message to be displayed on Front-End: " + response.toString(), Toast.LENGTH_SHORT).show();
                     }
                 },
@@ -98,19 +111,9 @@ public class SMSReceiver extends BroadcastReceiver {
                     public void onErrorResponse(VolleyError error) {Log.d("pokstTextToServer", "Error sending message to Server" + error.toString());
                         Toast.makeText(selfContext, error.toString(), Toast.LENGTH_SHORT).show();
                     }
-                }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("fromPhoneNumber", phoneNumber);
-                params.put("toPhoneNumber", userPhoneNumber);
-                params.put("textMessageBody", messageBody);
-                params.put("timestamp", timestamp.toString());
-                params.put("userId", Integer.toString(userId));
-                return params;
-            }
-        };
-        AmadeusApplication.getInstance().getRequestQueue().add(strRequest);
+                });
+
+        AmadeusApplication.getInstance().getRequestQueue().add(req);
     }
 
     public void updateServerWithWebappMessageId(final String amadeusId, final String msgid_phone_db) {
@@ -118,10 +121,17 @@ public class SMSReceiver extends BroadcastReceiver {
         final Context selfContext = context;
         String url = AMADEUS_API_URL + "/texts/update-outgoing-text-message-id";
 
-        StringRequest strRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
+        Map<String, String> params = new HashMap<>();
+        params.put("amadeusId", amadeusId);
+        params.put("msgid_phone_db", msgid_phone_db);
+
+        JSONObject jsonRequest = new JSONObject(params);
+
+        JsonObjectRequest req= new JsonObjectRequest(Request.Method.POST, url, jsonRequest,
+
+                new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONObject response) {
                         Toast.makeText(selfContext, "Response from Server after updating msgid_phone_db on Server: " + response.toString(), Toast.LENGTH_SHORT).show();
                     }
                 },
@@ -130,16 +140,9 @@ public class SMSReceiver extends BroadcastReceiver {
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(selfContext, error.toString(), Toast.LENGTH_SHORT).show();
                     }
-                }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("amadeusId", amadeusId);
-                params.put("msgid_phone_db", msgid_phone_db);
-                return params;
-            }
-        };
-        AmadeusApplication.getInstance().getRequestQueue().add(strRequest);
+                });
+
+        AmadeusApplication.getInstance().getRequestQueue().add(req);
     }
 
 
