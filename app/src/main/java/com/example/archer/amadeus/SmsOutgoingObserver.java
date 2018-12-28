@@ -14,8 +14,10 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
+
+import org.json.JSONObject;
 
 import java.util.Date;
 import java.util.HashMap;
@@ -114,10 +116,21 @@ public class SmsOutgoingObserver extends ContentObserver {
         RequestQueue queue = Volley.newRequestQueue(context);
         String url = AmadeusApplication.AMADEUS_API_URL + "/texts/own";
 
-        StringRequest strRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
+        Map<String, Object> params = new HashMap<>();
+        params.put("msgid_phone_db", _id);
+        params.put("thread_id", thread_id);
+        params.put("timestamp", timestamp.toString());
+        params.put("fromPhoneNumber", fromPhoneNumber);
+        params.put("toPhoneNumber", toPhoneNumber);
+        params.put("textMessageBody", messageBody);
+        params.put("userId", userId);
+
+        JSONObject jsonRequest = new JSONObject(params);
+
+        JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, url, jsonRequest,
+                new Response.Listener<JSONObject>() {
                     @Override
-                    public void onResponse(String response) {
+                    public void onResponse(JSONObject response) {
                         Toast.makeText(selfContext, "Sent own outgoing message upstream to server: " + response.toString(), Toast.LENGTH_SHORT).show();
                     }
                 },
@@ -128,21 +141,9 @@ public class SmsOutgoingObserver extends ContentObserver {
                         saveError(fromPhoneNumber, toPhoneNumber, messageBody, timestamp, error.toString());
 
                     }
-                }) {
-            @Override
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("msgid_phone_db", _id);
-                params.put("thread_id", thread_id);
-                params.put("timestamp", timestamp.toString());
-                params.put("fromPhoneNumber", fromPhoneNumber);
-                params.put("toPhoneNumber", toPhoneNumber);
-                params.put("textMessageBody", messageBody);
-                params.put("userId", Integer.toString(userId));
-                return params;
-            }
-        };
-        queue.add(strRequest);
+                });
+
+        queue.add(req);
     }
 
     private void saveError(String fromPhoneNumber, String toPhoneNumber, String messageBody, Long messageTime, String error) {
