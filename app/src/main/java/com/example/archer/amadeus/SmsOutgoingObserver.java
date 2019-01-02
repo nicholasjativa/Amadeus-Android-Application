@@ -28,6 +28,7 @@ import java.util.Map;
  */
 
 public class SmsOutgoingObserver extends ContentObserver {
+    private static Uri SENT_SMS_CONTENT_URI = Uri.parse("content://sms/sent");
     private Context context;
     private String lastSmsId = "";
     private SmsSingleton smsSingleton;
@@ -40,7 +41,7 @@ public class SmsOutgoingObserver extends ContentObserver {
 
         context = c;
         smsSingleton = SmsSingleton.getInstance();
-        Toast.makeText(context, "SmsOutgoingObserver hit..", Toast.LENGTH_LONG).show();
+        AmadeusLogger.appendLog("SmsOutgoingObserver instantiated", context);
 
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         hasHadFirstLogin = sharedPref.getBoolean(context.getString(R.string.pref_has_had_first_login), false);
@@ -53,12 +54,10 @@ public class SmsOutgoingObserver extends ContentObserver {
     public void onChange(boolean selfChange) {
         super.onChange(selfChange);
 
-        Uri uriSMSURI = Uri.parse("content://sms/sent");
-        Cursor cur = context.getContentResolver().query(uriSMSURI, null, null, null, null);
+        Cursor cur = context.getContentResolver().query(SENT_SMS_CONTENT_URI, null, null, null, null);
         cur.moveToNext();
 
         String _id = cur.getString(cur.getColumnIndex("_id"));
-        Toast.makeText(context, "You sent a message so sending to webapp..", Toast.LENGTH_LONG).show();
         if (smsSingleton.getOutgoingSkipCount() > 0 && hasHadFirstLogin && userId > -1) {
 
             // don't send the message up to the server (since it came from the webapp)
@@ -110,13 +109,14 @@ public class SmsOutgoingObserver extends ContentObserver {
         params.put("textMessageBody", messageBody);
         params.put("userId", userId);
 
+        String logStr = String.format("Sending user created message to: %s with body: %s", toPhoneNumber, messageBody);
+        AmadeusLogger.appendLog( logStr, context);
         JSONObject jsonRequest = new JSONObject(params);
 
         JsonObjectRequest req = new JsonObjectRequest(Request.Method.POST, url, jsonRequest,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Toast.makeText(selfContext, "Sent own outgoing message upstream to server: " + response.toString(), Toast.LENGTH_SHORT).show();
                     }
                 },
                 new Response.ErrorListener() {

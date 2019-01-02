@@ -6,8 +6,8 @@ package com.example.archer.amadeus;
 
 public class SmsSingleton {
     private static final SmsSingleton ourInstance = new SmsSingleton();
-    private int incomingSkipCount;
-    private int outgoingSkipCount;
+    private int incomingSkipCount = 0;
+    private int outgoingSkipCount = 0;
 
 
     static SmsSingleton getInstance() {
@@ -15,8 +15,6 @@ public class SmsSingleton {
     }
 
     private SmsSingleton() {
-        this.incomingSkipCount = 0;
-        this.outgoingSkipCount= 0;
     }
 
     public void decrementIncomingSkipCount() {

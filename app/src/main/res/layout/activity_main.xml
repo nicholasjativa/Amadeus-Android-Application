@@ -7,26 +7,26 @@
     tools:context="com.example.archer.amadeus.MainActivity"
     tools:layout_editor_absoluteY="81dp">
 
-    <TextView
-        android:id="@+id/firebaseToken"
+    <Button
+        android:id="@+id/button_view_log"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_width="wrap_content"
-        android:text="Firebase Token Placeholder"
-        android:textIsSelectable="true"
+        android:onClick="goToLogActivity"
+        android:text="@string/button_view_log"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toBottomOf="parent" />
 
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/button_view_error_log"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:onClick="goToErrorLogActivity"
-        android:text="@string/button_view_errors"
+        android:text="@string/button_view_error_log"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/firebaseToken" />
+        app:layout_constraintTop_toBottomOf="@id/button_view_log" />
 
 </android.support.constraint.ConstraintLayout>

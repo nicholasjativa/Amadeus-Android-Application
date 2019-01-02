@@ -11,7 +11,6 @@ public class AmadeusApplication extends Application {
     private static AmadeusApplication instance;
     private RequestQueue queue;
 
-
     @Override
     public void onCreate() {
         super.onCreate();

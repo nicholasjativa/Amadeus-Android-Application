@@ -32,7 +32,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
 
         <receiver android:name=".SMSReceiver">
             <intent-filter android:priority="2147483647">
@@ -69,24 +69,24 @@
             android:name=".OutgoingSmsObserverBroadcastReceiver"
             android:enabled="true"
             android:exported="true">
-
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-            </intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
 
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
             <intent-filter>
-                <action android:name="android.intent.action.PACKAGE_REPLACED"/>
-                <data android:scheme="package"/>
-            </intent-filter>
+                <action android:name="android.intent.action.PACKAGE_REPLACED" />
 
+                <data android:scheme="package" />
+            </intent-filter>
             <intent-filter>
-                <action android:name="action.intent.action.PACKAGE_ADDED"/>
-                <data android:scheme="package"/>
-            </intent-filter>
+                <action android:name="action.intent.action.PACKAGE_ADDED" />
 
+                <data android:scheme="package" />
+            </intent-filter>
         </receiver>
 
+        <activity android:name=".ViewLogActivity"></activity>
     </application>
 
 </manifest>

@@ -62,9 +62,6 @@ public class MainActivity extends AppCompatActivity {
                     transmitContacts(contacts);
                 }
             }).start();
-
-            TextView textView = (TextView) findViewById(R.id.firebaseToken);
-            textView.setText(firebaseToken);
         }
     }
 
@@ -78,6 +75,11 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    public void goToLogActivity(View view) {
+        Intent goToLogIntent = new Intent(this, ViewLogActivity.class);
+        startActivity(goToLogIntent);
     }
 
     public void goToErrorLogActivity(View view) {
@@ -148,9 +150,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(context, error.toString(), Toast.LENGTH_SHORT).show();
                     }
-                }) {
-
-        };
+                });
 
         AmadeusApplication.getInstance().getRequestQueue().add(req);
     }
