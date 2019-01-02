@@ -27,17 +27,6 @@ import java.util.Map;
  * Created by noble on 9/27/17.
  */
 
-/*
-    This is currently a catch-all (unfortunately).
-    It fires whenever the Android device send a texts message.
-    For our purpose, it should catch whatever messages are sent by hand through Android Messages
-    and relay them upstream to the Amadeus Server, where it'll add it to a conversation table.
-    From this update, the message should go further upstream to the client and appear as a message
-    sent by the client.
-    The end goal is to have all messages that are sent by hand on the Android appear on the client
-    web app as well.
- */
-
 public class SmsOutgoingObserver extends ContentObserver {
     private Context context;
     private String lastSmsId = "";
@@ -51,6 +40,7 @@ public class SmsOutgoingObserver extends ContentObserver {
 
         context = c;
         smsSingleton = SmsSingleton.getInstance();
+        Toast.makeText(context, "SmsOutgoingObserver hit..", Toast.LENGTH_LONG).show();
 
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         hasHadFirstLogin = sharedPref.getBoolean(context.getString(R.string.pref_has_had_first_login), false);
@@ -61,19 +51,14 @@ public class SmsOutgoingObserver extends ContentObserver {
 
     @Override
     public void onChange(boolean selfChange) {
-        // observe outgoing "sent" sms messages
-
         super.onChange(selfChange);
-        //Log.d("AMADEUSTEST", "The incoming skip count in SMOO is " + smsSingleton.getIncomingSkipCount());
-        // we only want messages to be sent to the server if it ORIGINATES on the phone
-        // and thus NOT if it is a message that came from the webapp
 
         Uri uriSMSURI = Uri.parse("content://sms/sent");
         Cursor cur = context.getContentResolver().query(uriSMSURI, null, null, null, null);
         cur.moveToNext();
 
         String _id = cur.getString(cur.getColumnIndex("_id"));
-
+        Toast.makeText(context, "You sent a message so sending to webapp..", Toast.LENGTH_LONG).show();
         if (smsSingleton.getOutgoingSkipCount() > 0 && hasHadFirstLogin && userId > -1) {
 
             // don't send the message up to the server (since it came from the webapp)

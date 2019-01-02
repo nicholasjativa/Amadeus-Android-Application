@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.widget.Toast;
 
 public class OutgoingSmsWatcherService extends Service {
     public OutgoingSmsWatcherService() {
@@ -23,20 +24,12 @@ public class OutgoingSmsWatcherService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         super.onStartCommand(intent, flags, startId);
-        runAsForeground();
-        registerContentObserver();
+
+        Toast.makeText(this, "OutgoingSmsWatcherService hit..", Toast.LENGTH_LONG).show();
+        SmsOutgoingObserver observer = new SmsOutgoingObserver(new Handler(), this);
+        getContentResolver().registerContentObserver(Uri.parse("content://sms"), true, observer);
+
         return START_STICKY;
     }
 
-    public void runAsForeground() {
-        Intent notificationIntent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_ONE_SHOT);
-        Notification notification = new NotificationCompat.Builder(this).setSmallIcon(R.mipmap.ic_launcher).setContentText("Test").setContentIntent(pendingIntent).build();
-
-        startForeground(1, notification);
-    }
-
-    private void registerContentObserver() {
-
-    }
 }

@@ -8,8 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.net.Uri;
-import android.os.Handler;
+
 import android.provider.ContactsContract;;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -66,8 +65,6 @@ public class MainActivity extends AppCompatActivity {
 
             TextView textView = (TextView) findViewById(R.id.firebaseToken);
             textView.setText(firebaseToken);
-            SmsOutgoingObserver observer = new SmsOutgoingObserver(new Handler(), this);
-            getContentResolver().registerContentObserver(Uri.parse("content://sms"), true, observer); // TODO this should be a long running service
         }
     }
 
