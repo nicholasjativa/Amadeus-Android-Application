@@ -108,7 +108,7 @@ public class SMSReceiver extends BroadcastReceiver {
                 },
                 new Response.ErrorListener() {
                     @Override
-                    public void onErrorResponse(VolleyError error) {Log.d("pokstTextToServer", "Error sending message to Server" + error.toString());
+                    public void onErrorResponse(VolleyError error) {
                         Toast.makeText(selfContext, error.toString(), Toast.LENGTH_SHORT).show();
                     }
                 });
