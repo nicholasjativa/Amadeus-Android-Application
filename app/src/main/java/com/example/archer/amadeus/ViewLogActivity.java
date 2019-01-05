@@ -2,6 +2,7 @@ package com.example.archer.amadeus;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 
 import java.io.BufferedReader;
@@ -42,5 +43,9 @@ public class ViewLogActivity extends AppCompatActivity {
         TextView tvLog = (TextView) findViewById(R.id.textview_log);
         tvLog.setText(entireFile);
 
+    }
+
+    public void clearLog(View view) {
+        AmadeusLogger.clearLog(getApplicationContext());
     }
 }

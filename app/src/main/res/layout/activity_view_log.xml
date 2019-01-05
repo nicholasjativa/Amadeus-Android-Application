@@ -6,11 +6,23 @@
     android:layout_height="match_parent"
     tools:context=".ViewLogActivity">
 
+    <Button
+        android:id="@+id/button_clear_log"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:onClick="clearLog"
+        android:text="@string/button_clear_log"
+        app:layout_constraintEnd_toEndOf="parent">
+
+    </Button>
+
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
-        android:fillViewport="true">
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/button_clear_log">
 
         <TextView
             android:id="@+id/textview_log"

@@ -36,6 +36,7 @@ public class SMSReceiver extends BroadcastReceiver {
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onReceive(Context c, Intent intent) {
+
         context = c;
         AMADEUS_API_URL = AmadeusApplication.AMADEUS_API_URL;
         String actionName = intent.getAction();
@@ -44,7 +45,7 @@ public class SMSReceiver extends BroadcastReceiver {
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         boolean hasHadFirstLogin = sharedPref.getBoolean(context.getString(R.string.pref_has_had_first_login), false);
         int userId = sharedPref.getInt(context.getString(R.string.pref_user_id), -1);
-        String userPhoneNumber = sharedPref.getString(context.getString(R.string.pref_user_phone_number), ""); // TODO these may have to become instance variables
+        String userPhoneNumber = sharedPref.getString(context.getString(R.string.pref_user_phone_number), "");
 
         if (hasHadFirstLogin && userId > -1) {
 
@@ -103,12 +104,13 @@ public class SMSReceiver extends BroadcastReceiver {
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
-                        Toast.makeText(selfContext, "Response from Server after relaying message to be displayed on Front-End: " + response.toString(), Toast.LENGTH_SHORT).show();
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
+                        String logMsg = String.format("Text message unsuccessfully sent with body: %s and error: %s", messageBody, error.toString());
+                        AmadeusLogger.appendLog(logMsg, selfContext);
                         Toast.makeText(selfContext, error.toString(), Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -143,66 +145,6 @@ public class SMSReceiver extends BroadcastReceiver {
                 });
 
         AmadeusApplication.getInstance().getRequestQueue().add(req);
-    }
-
-
-    /* ------------------------------- HELPER for printing bundle extras ----------------- */
-    public static String intentToString(Intent intent) {
-        if (intent == null) {
-            return null;
-        }
-
-        return intent.toString() + " " + bundleToString(intent.getExtras());
-    }
-
-    public static String bundleToString(Bundle bundle) {
-        StringBuilder out = new StringBuilder("Bundle[");
-
-        if (bundle == null) {
-            out.append("null");
-        } else {
-            boolean first = true;
-            for (String key : bundle.keySet()) {
-                if (!first) {
-                    out.append(", ");
-                }
-
-                out.append(key).append('=');
-
-                Object value = bundle.get(key);
-
-                if (value instanceof int[]) {
-                    out.append(Arrays.toString((int[]) value));
-                } else if (value instanceof byte[]) {
-                    out.append(Arrays.toString((byte[]) value));
-                } else if (value instanceof boolean[]) {
-                    out.append(Arrays.toString((boolean[]) value));
-                } else if (value instanceof short[]) {
-                    out.append(Arrays.toString((short[]) value));
-                } else if (value instanceof long[]) {
-                    out.append(Arrays.toString((long[]) value));
-                } else if (value instanceof float[]) {
-                    out.append(Arrays.toString((float[]) value));
-                } else if (value instanceof double[]) {
-                    out.append(Arrays.toString((double[]) value));
-                } else if (value instanceof String[]) {
-                    out.append(Arrays.toString((String[]) value));
-                } else if (value instanceof CharSequence[]) {
-                    out.append(Arrays.toString((CharSequence[]) value));
-                } else if (value instanceof Parcelable[]) {
-                    out.append(Arrays.toString((Parcelable[]) value));
-                } else if (value instanceof Bundle) {
-                    out.append(bundleToString((Bundle) value));
-                } else {
-                    out.append(value);
-                }
-
-                first = false;
-            }
-        }
-
-        out.append("]");
-        return out.toString();
     }
 
 }

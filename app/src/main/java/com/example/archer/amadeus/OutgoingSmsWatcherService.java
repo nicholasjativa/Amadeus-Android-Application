@@ -28,4 +28,9 @@ public class OutgoingSmsWatcherService extends Service {
         return START_STICKY;
     }
 
+    @Override
+    public void onDestroy() {
+        AmadeusLogger.appendLog("OutgoingSmsWatcherService is being destroyed", this);
+    }
+
 }

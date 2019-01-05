@@ -9,6 +9,7 @@
 
     <string name="button_view_error_log">View Error Log</string>
     <string name="button_view_log">View Log</string>
+    <string name="button_clear_log">Clear Log</string>
     <string name="button_delete_all_errors">Delete All Errors</string>
     <string name="textview_log_empty">Nothing written to log yet</string>
     <string name="title_activity_login">Sign in</string>

@@ -11,7 +11,7 @@ import com.google.firebase.iid.FirebaseInstanceIdService;
  * Created by noble on 9/30/17.
  */
 
-public class MyFirebaseInstanceIdService extends FirebaseInstanceIdService {
+public class AmadeusFirebaseInstanceIdService extends FirebaseInstanceIdService {
     @Override
     public void onTokenRefresh() {
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();

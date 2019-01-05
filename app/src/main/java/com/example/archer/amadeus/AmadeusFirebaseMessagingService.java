@@ -10,15 +10,16 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Map;
 
-public class MyFirebaseMessagingService extends FirebaseMessagingService {
+public class AmadeusFirebaseMessagingService extends FirebaseMessagingService {
     private Context context;
     private SmsSingleton smsSingleton = SmsSingleton.getInstance();
     ;
-    public MyFirebaseMessagingService() {
+    public AmadeusFirebaseMessagingService() {
     }
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
+
         if (remoteMessage.getData().size() > 0) {
 
             Map textInfoJson = remoteMessage.getData();
@@ -30,13 +31,11 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
         }
 
-        if (remoteMessage.getNotification() != null) {
-
-        }
     }
 
 
     public void sendText(String toPhoneNumber, String message, String amadeusId) {
+        
         SmsManager smsManager = SmsManager.getDefault();
         Intent sI = new Intent(SMSReceiver.SMS_SENT_ACTION);
         sI.putExtra("amadeusId", amadeusId);
