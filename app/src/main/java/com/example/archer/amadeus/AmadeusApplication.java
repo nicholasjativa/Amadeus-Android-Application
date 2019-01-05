@@ -10,7 +10,7 @@ import com.android.volley.toolbox.Volley;
 public class AmadeusApplication extends Application {
     public static String AMADEUS_API_URL;
     private static AmadeusApplication instance;
-    private static int MY_SOCKET_TIMEOUT_MS = 3000;
+    private static int MY_SOCKET_TIMEOUT_MS = 5000;
     private RequestQueue queue;
 
     @Override

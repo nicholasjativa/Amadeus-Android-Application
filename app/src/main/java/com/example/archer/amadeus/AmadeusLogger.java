@@ -33,6 +33,7 @@ public class AmadeusLogger {
 
             BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
             buf.append(timestamp);
+            buf.newLine();
             buf.append(text);
             buf.newLine();
             buf.close();
