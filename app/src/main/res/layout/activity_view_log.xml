@@ -6,11 +6,19 @@
     android:layout_height="match_parent"
     tools:context=".ViewLogActivity">
 
-    <TextView
-        android:id="@+id/textview_log"
-        android:layout_width="wrap_content"
+    <ScrollView
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:text="@string/textview_log_empty"/>
+        android:scrollbars="vertical"
+        android:fillViewport="true">
+
+        <TextView
+            android:id="@+id/textview_log"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="@string/textview_log_empty"/>
+
+    </ScrollView>
 
 </android.support.constraint.ConstraintLayout>
